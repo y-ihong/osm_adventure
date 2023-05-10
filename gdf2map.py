@@ -37,27 +37,27 @@ def gdf2map(df,m):
                     if voltage >= 11000 and voltage < 66000:
                         style_function=lambda x: {'fillColor': 'orange',
                                                   'color':'orange',
-                                                  'weight':1}
+                                                  'weight':2}
                     elif voltage >= 66000 and voltage < 132000:
                         style_function=lambda x: {'fillColor': 'red',
                                                   'color':'red',
-                                                  'weight':1}
+                                                  'weight':2}
                     elif voltage >= 132000 and voltage < 330000:
                         style_function=lambda x: {'fillColor': 'purple',
                                                   'color':'purple',
-                                                  'weight':1}
+                                                  'weight':2}
                     elif voltage >= 330000 and voltage <= 500000:
                         style_function=lambda x: {'fillColor': 'black',
                                                   'color':'black',
-                                                  'weight':1}
+                                                  'weight':2}
                     else:
                         style_function=lambda x: {'fillColor': 'yellow',
                                                   'color':'yellow',
-                                                  'weight':1}
+                                                  'weight':2}
             else:
                 style_function=lambda x: {'fillColor': 'yellow',
                                           'color':'yellow',
-                                          'weight':1}
+                                          'weight':2}
                 
         if row[0][0] == 'node':
             # Setup the content of the popup

@@ -44,28 +44,63 @@ def mlf_chloropleth(state,m):
         gdf = pd.concat([gdf, geom])
         nodes.append(str(row[1][0]))
         mlfs.append((row[1][3]))
-        
-    mlf_df['Nodes'] = nodes
-    mlf_df['MLF'] = mlfs
     
-    gdf['Nodes'] = nodes
+    # Include ACT MLF values if state is NSW
+    # if state == 'NSW':
+    #     df = pd.read_excel(mlf_file, 'ACT')
+    #     for row in df.iterrows():
+    #         node = str(row[1][0]) + ', ' + 'ACT' + ', AU'
+    #         try:
+    #             geom = ox.geocode_to_gdf(node)
+    #         except ValueError:
+    #             continue
+    #         gdf = pd.concat([gdf, geom])
+    #         nodes.append(str(row[1][0]))
+    #         mlfs.append((row[1][3]))
+            
+    # Create dataframes and geojson for choropleth making
+    mlf_df['Node'] = nodes
+    mlf_df['MLF'] = mlfs
+    gdf['Node'] = nodes
+    gdf['MLF'] = mlfs
     
     gdf = gdf.to_json()
-    
+
     folium.Choropleth(geo_data=gdf,
                       name="choropleth",
                       data=mlf_df,
-                      columns=["Nodes", "MLF"],
-                      key_on='feature.properties.Nodes',
+                      columns=["Node", "MLF"],
+                      key_on='feature.properties.Node',
                       fill_color="YlOrRd",
                       fill_opacity=0.7,
-                      line_opacity=.1,
-                      # bins = [0.8, 0.85, 0.9, 0.95, 1.0, 1.05, 1.1],
+                      line_opacity=0.1,
                       legend_name='MLF Values',
                       ).add_to(m)
     
     folium.LayerControl().add_to(m)
     
-    return m, mlf_df
+    # Add hover functionality
+    style_function = lambda x: {'fillColor': '#ffffff', 
+                                'color':'#000000', 
+                                'fillOpacity': 0.1, 
+                                'weight': 0.1}
+    highlight_function = lambda x: {'fillColor': '#000000', 
+                                    'color':'#000000', 
+                                    'fillOpacity': 0.50, 
+                                    'weight': 0.1}
+    
+    hover = folium.features.GeoJson(data = gdf,
+                                    style_function=style_function, 
+                                    control=False,
+                                    highlight_function=highlight_function, 
+                                    tooltip=folium.features.GeoJsonTooltip(fields=['Node','MLF'],
+                                                                           aliases=['Node','MLF'],
+                                                                           style=("background-color: white; color: #333333; font-size: 12px; padding: 10px") 
+                                                                           )
+                                    )   
+    m.add_child(hover)
+    m.keep_in_front(hover)
+    
+    return m
 
 

@@ -2,7 +2,7 @@
 """
 Created on Fri May  5 00:55:46 2023
 
-This the main file for visualising power system data from OSM,
+This the main file for visualising Australian power system data from OSM,
 using the osmnx module, folium, and matplotlib.
 
 @author: LIY1
@@ -11,6 +11,9 @@ using the osmnx module, folium, and matplotlib.
 import folium
 import time
 import osmnx as ox
+import matplotlib.pyplot as plt
+
+# Import modules
 from gdf2map import *
 from gdf2plot import *
 from mlf_chloropleth import *
@@ -31,25 +34,28 @@ centre_lat = centre[0].y
 # Extract OSM data and create a geodataframe with NSW power infrastructure
 substation_tags = {'power':'substation'}   
 substations = ox.geometries_from_place(place_name, substation_tags)
-line_tags = {'power':'line'}   
-lines = ox.geometries_from_place(place_name, line_tags)
 gen_tags = {'power':'generator'}
 gens = ox.geometries_from_place(place_name, gen_tags)
+line_tags = {'power':'line'}   
+lines = ox.geometries_from_place(place_name, line_tags)
 
 # Create a folium map
 m = folium.Map(location=[centre_lat,centre_lon],
                  zoom_start=12, control_scale=True)
 
-# Call function to add power infrastructure to map
+# Call function to add power infrastructure to interactive map
 m = gdf2map(substations,m)
 m = gdf2map(lines,m)
 m = gdf2map(gens,m)
 
-# Call the function to create a choropleth on map
-m, mlf_df =  mlf_chloropleth(state,m)
+# Call the function to create a choropleth on interactive map
+m =  mlf_chloropleth(state,m)
 
 # Save to .html file in working folder
 m.save('subs.html')
+
+# Create figure and call function to create a stationary map
+gdf2plot(substations,gens,lines,centre_lat,centre_lon)
 
 # End timer
 end = time.time()
