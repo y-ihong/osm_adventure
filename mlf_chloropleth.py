@@ -45,6 +45,19 @@ def mlf_chloropleth(state,m):
         nodes.append(str(row[1][0]))
         mlfs.append((row[1][3]))
         
+    # Include ACT MLF values if state is NSW
+    # if state == 'NSW':
+    #     df = pd.read_excel(mlf_file, 'ACT')
+    #     for row in df.iterrows():
+    #         node = str(row[1][0]) + ', ' + 'ACT' + ', AU'
+    #         try:
+    #             geom = ox.geocode_to_gdf(node)
+    #         except ValueError:
+    #             continue
+    #         gdf = pd.concat([gdf, geom])
+    #         nodes.append(str(row[1][0]))
+    #         mlfs.append((row[1][3]))
+        
     mlf_df['Nodes'] = nodes
     mlf_df['MLF'] = mlfs
     
