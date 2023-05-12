@@ -28,44 +28,48 @@ def gdf2map(df,m):
         # Determine line color based on the line voltage
         elif 'line' in row[1]:
             # Check for NaN values and convert string to integer
-            if pd.isnull(row[1]['voltage']) != True:
-                if ';' in row[1]['voltage']:
-                    voltage = 1
-                else:
-                    voltage = int(row[1]['voltage'])
-            
-                    if voltage >= 11000 and voltage < 66000:
-                        style_function=lambda x: {'fillColor': 'orange',
-                                                  'color':'orange',
-                                                  'weight':2}
-                    elif voltage >= 66000 and voltage < 132000:
-                        style_function=lambda x: {'fillColor': 'red',
-                                                  'color':'red',
-                                                  'weight':2}
-                    elif voltage >= 132000 and voltage < 330000:
-                        style_function=lambda x: {'fillColor': 'purple',
-                                                  'color':'purple',
-                                                  'weight':2}
-                    elif voltage >= 330000 and voltage <= 500000:
-                        style_function=lambda x: {'fillColor': 'black',
-                                                  'color':'black',
-                                                  'weight':2}
-                    else:
-                        style_function=lambda x: {'fillColor': 'yellow',
-                                                  'color':'yellow',
-                                                  'weight':2}
+            # if pd.isnull(row[1]['voltage']) != True or row[1]['voltage'] != 'unknown':
+            #     if ';' in str(row[1]['voltage']):
+            #         voltage = 66000
+            #     else:
+            try:
+                voltage = int(row[1]['voltage'])
+            except ValueError or TypeError:
+                voltage = 66000
+                
+            if voltage >= 11000 and voltage < 66000:
+                style_function=lambda x: {'fillColor': 'orange',
+                                          'color':'orange',
+                                          'weight':1}
+            elif voltage >= 66000 and voltage < 132000:
+                style_function=lambda x: {'fillColor': 'red',
+                                          'color':'red',
+                                          'weight':1}
+            elif voltage >= 132000 and voltage < 330000:
+                style_function=lambda x: {'fillColor': 'purple',
+                                          'color':'purple',
+                                          'weight':1}
+            elif voltage >= 330000 and voltage <= 500000:
+                style_function=lambda x: {'fillColor': 'black',
+                                          'color':'black',
+                                          'weight':1}
             else:
                 style_function=lambda x: {'fillColor': 'yellow',
                                           'color':'yellow',
-                                          'weight':2}
+                                          'weight':1}
+            
+        # Setup the content of the popup
+        try:
+            name = str(row[1]['name'])
+        except KeyError:
+            name = 'Unknown'
+        
+        iframe = folium.IFrame('Name:' + name)
+        
+        # Initialise the popup using the iframe
+        popup = folium.Popup(iframe, min_width=300, max_width=300)   
                 
-        if row[0][0] == 'node':
-            # Setup the content of the popup
-            iframe = folium.IFrame('Name:' + str(row[1]['name']))
-            
-            # Initialise the popup using the iframe
-            popup = folium.Popup(iframe, min_width=300, max_width=300)
-            
+        if row[0][0] == 'node':            
             # Add each row to the map by extracting coordinates from shapely point
             # folium.Marker(location=[row[1]['geometry'].xy[1][0],row[1]['geometry'].xy[0][0]], 
             #               popup=popup, icon=folium.Icon(icon='cloud')).add_to(m)
@@ -73,18 +77,12 @@ def gdf2map(df,m):
                            marker=folium.CircleMarker(radius = 2),
                            style_function=style_function).add_to(m) 
             
-        elif row[0][0] == 'way' or row[0][0] == 'relation':
-            # Setup the content of the popup
-            iframe = folium.IFrame('Name:' + str(row[1]['name']))
-            
-            # Initialise the popup using the iframe
-            popup = folium.Popup(iframe, min_width=300, max_width=300)
-            
+        elif row[0][0] == 'way' or row[0][0] == 'relation':           
             # Add each row to the map by extracting coordinates from shapely polygon
             # Without simplifying, the map might not be displayed
             geo = gpd.GeoSeries(row[1]['geometry']).simplify(tolerance=0.001)
             geo_j = geo.to_json()
-            folium.GeoJson(data=geo_j, popup=popup, name=str(row[1]['name']),
+            folium.GeoJson(data=geo_j, popup=popup, name=name,
                            style_function=style_function).add_to(m)
                     
     return m

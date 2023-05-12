@@ -41,7 +41,7 @@ def gdf2plot(df1,df2,df3,centre_lat,centre_lon):
     # Project using coordinate reference system (CRS) of street map
     ax = plt.axes(projection=osm_img.crs) 
     center_pt = [centre_lat, centre_lon] # lat/lon of centre of map display
-    zoom = 0.1 # for zooming out of center point
+    zoom = 4 # for zooming out of center point
     extent = [center_pt[1]-(zoom*2.0),center_pt[1]+(zoom*2.0),center_pt[0]-zoom,center_pt[0]+zoom] # adjust to zoom
     ax.set_extent(extent) # set extents
 
@@ -53,6 +53,10 @@ def gdf2plot(df1,df2,df3,centre_lat,centre_lon):
     ax.add_geometries(df2.geometry, crs=ccrs.PlateCarree(), edgecolor='green', facecolor='none', linewidth=2)
     ax.add_geometries(df3.geometry, crs=ccrs.PlateCarree(), edgecolor='red', facecolor='none', linewidth=1)
     
+    ax.annotate('You are here', xy=(0,0), xycoords='figure pixels',
+                xytext=(0, 0), textcoords='offset pixels',
+                arrowprops=dict(facecolor='black', shrink=0.1),
+                horizontalalignment='right', verticalalignment='bottom')
     # if type == 'substation':
     #     ax.plot([lon], [lat],
     #               color='blue', marker='.',

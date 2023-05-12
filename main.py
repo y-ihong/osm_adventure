@@ -16,13 +16,14 @@ import matplotlib.pyplot as plt
 # Import modules
 from gdf2map import *
 from gdf2plot import *
-from mlf_chloropleth import *
+from mlf_choropleth import *
 
 # Start timer
 start = time.time()
 
 # Specify the place that is used to seach for the data
-place_name = 'Sydney, NSW, AU'
+place_name = 'Broken Hill, NSW, AU'
+zoom = 8 # The higher the more zoomed in
 # Input the state for mlf projections
 state = 'NSW'
 
@@ -41,7 +42,7 @@ lines = ox.geometries_from_place(place_name, line_tags)
 
 # Create a folium map
 m = folium.Map(location=[centre_lat,centre_lon],
-                 zoom_start=12, control_scale=True)
+                 zoom_start=zoom, control_scale=True)
 
 # Call function to add power infrastructure to interactive map
 m = gdf2map(substations,m)
